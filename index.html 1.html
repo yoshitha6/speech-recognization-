@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Speech Recognition</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            perspective: 1000px; /* Enable 3D effects */
+        }
+
+        h1 {
+            font-size: 2em;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        button {
+            background-color: #ffffff;
+            color: #4facfe;
+            border: none;
+            padding: 15px 30px;
+            margin: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 6px 10px rgba(0, 0, 0, 0.2),
+                inset 0 -4px 0 rgba(0, 0, 0, 0.1);
+            transform-style: preserve-3d;
+        }
+
+        button:hover {
+            background-color: #4facfe;
+            color: white;
+            transform: translateY(-4px) scale(1.05) rotateX(5deg);
+            box-shadow: 
+                0 10px 15px rgba(0, 0, 0, 0.3),
+                inset 0 -4px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        #output {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 20px;
+            width: 80%;
+            max-width: 650px;
+            min-height: 120px;
+            font-size: 18px;
+            color: #333;
+            line-height: 1.6;
+            box-shadow: 
+                0 12px 25px rgba(0, 0, 0, 0.2),
+                inset 0 0 5px rgba(0, 0, 0, 0.05);
+            transform: rotateX(2deg);
+        }
+    </style>
+</head>
+<body>
+    <h1>🎙️ Speech Recognition</h1>
+    <button onclick="startRecognition()">Start Recognition</button>
+    <button onclick="stopRecognition()">Stop Recognition</button>
+    <p id="output"></p>
+
+    <script>
+        const output = document.getElementById('output');
+        let recognition;
+        let isRecognizing = false;
+
+        function startRecognition() {
+            if (isRecognizing) return;
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert('Speech Recognition API is not supported in this browser.');
+                return;
+            }
+
+            recognition = new SpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.continuous = true;
+            recognition.interimResults = false;
+            isRecognizing = true;
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[event.results.length - 1][0].transcript;
+                output.textContent += transcript + ' ';
+            };
+
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error:', event.error);
+            };
+
+            recognition.onend = function() {
+                if (isRecognizing) {
+                    recognition.start();
+                }
+            };
+
+            recognition.start();
+        }
+
+        function stopRecognition() {
+            if (recognition && isRecognizing) {
+                isRecognizing = false;
+                recognition.stop();
+            }
+        }
+    </script>
+</body>
+</html>
